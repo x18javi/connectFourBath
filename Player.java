@@ -1,8 +1,8 @@
-// use abstract class? We want it to guard against overflow regardless of player, only variable really is how user inputs (ie random or user?)
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+// abstract class player, cannot be instantiated. Set some default methods like printing the generic players token colour
 public abstract class Player {
     char tokenColour;
 
@@ -14,18 +14,18 @@ public abstract class Player {
         System.out.print("Player "+this.tokenColour+"'s turn.\n");
     }
 
+    // define abstract method get input that subclasses must implement
     public abstract int getInput();
-    // type of player, if human, take input and guard, if robot, generate random input
 }
 
-// limit input to numbers only
-
+// human player
 class Human extends Player {
 
     public Human(char colour){
         super(colour);
     }
 
+    // human input gets read from cmd, calls getUserInput which has further error handling. Loops until it can return a valid input
     public int getInput(){
         int inp = -1;
         while(inp == -1){
@@ -34,6 +34,7 @@ class Human extends Player {
         return inp;
     }
 
+    // getUserInput and protect against values which are not numbers
     public int getUserInput(){
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int userin = -1;
@@ -54,14 +55,17 @@ class Human extends Player {
     }
 }
 
+// create robot player to play against
 class Robot extends Player {
     int length;
 
+    // robot requires an extra length parameter to be passed upon creation, this should be the size number of columns in the board
     public Robot(char colour, int length){
         super(colour);
         this.length = length;
     }
 
+    // the length parameter limits the range of the random number generator, so the returned value is always between 1 and the number of columns
     public int getInput(){
         this.printPrompt();
         return (int)(Math.random()*this.length);

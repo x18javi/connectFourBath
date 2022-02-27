@@ -6,12 +6,6 @@ public class Board {
         this.board = new char[row][column];
     }
 
-    public static void main(String[] args){
-        Board b = new Board(6,7);
-        b.placeCounter(1,'r');
-        System.out.print("Ok");
-    }
-
     // public helper to get the size of a column (ie vertical on board)
     public int getColumnSize(){
         return this.board.length-1;
@@ -67,7 +61,7 @@ public class Board {
         return column <= getBoardSize();
     }
 
-    // return true if there is space in the array
+    // return true if there is space in the current column (array)
     private boolean guardColumnOverflow(int column){
         int rowCount = getColumnSize();
         int countOfUsedElements = 0;

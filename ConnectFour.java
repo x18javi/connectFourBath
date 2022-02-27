@@ -1,34 +1,19 @@
 import java.util.ArrayList;
 
-public class ConnectFour {
-    private ArrayList<Player> playerList;
-    private Board board;
+// logic specific to the game connect four
+public class ConnectFour extends boardGame{
 
+    // instantiate the class with the known board size of 6x7
     public ConnectFour(){
-        this.board = new Board(6,7);
-        this.playerList = new ArrayList<>();
+        super(6,7);
     }
 
-    /*
-    public static void main(String[] args){
-        ConnectFour cf = new ConnectFour();
-        cf.board.setElementInColumn(0,0,'r');
-        cf.board.setElementInColumn(1,1,'r');
-        cf.board.setElementInColumn(2,2,'r');
-        cf.board.setElementInColumn(3,3,'r');
-        System.out.print(cf.checkForWinner('r'));
-        cf.board.setElementInColumn(5,0,'r');
-        cf.board.setElementInColumn(4,1,'r');
-        cf.board.setElementInColumn(3,2,'r');
-        cf.board.setElementInColumn(2,3,'r');
-        System.out.print(cf.checkForWinner('r'));
-    }
-     */
-
-    public void addPlayer(Player p){
-        this.playerList.add(p);
+    // helper function to return the number of columns in the board
+    public int getBoardLength(){
+        return this.board.getBoardSize()+1;
     }
 
+    // validate player input, takes a Player class as the parameter
     public void getInput(Player p){
         boolean successChecker = false;
         while(!successChecker){
@@ -41,6 +26,7 @@ public class ConnectFour {
         }
     }
 
+    // play the game. Loop through the players who are stored in the playerlist, getting the players input and checking for a winner each time
     public void playGame(){
         displayToCmd disp = new displayToCmd(this.board);
         boolean breakGame = false;
@@ -61,13 +47,12 @@ public class ConnectFour {
         }
     }
 
+    // consolidate the different checks that are run in connect for, vertical, horizontal, diagonal from left-to-right and right-to-left
     private boolean checkForWinner(char player){
         boolean check = false;
         if(
             checkForHorizontalWinners(player) ||
             checkForVerticalWinners(player) ||
-            //checkForWinners(player,"Vertical") ||
-            //checkForWinners(player, "Horizontal") ||
             checkForDiagonalWinners(player, 1) ||
             checkForDiagonalWinners(player, -1)
         ){
@@ -76,8 +61,8 @@ public class ConnectFour {
         return check;
     }
 
+    // logic to check for a horizontal winner on the board
     private boolean checkForHorizontalWinners(char player){
-        // check horizontal
         boolean hasWon = false;
         int count = 0;
         int columns = this.board.getBoardSize();
@@ -99,6 +84,7 @@ public class ConnectFour {
         return hasWon;
     }
 
+    // logic to check for a vertical winner on the board
     private boolean checkForVerticalWinners(char player){
         boolean hasWon = false;
         int count = 0;
@@ -121,42 +107,10 @@ public class ConnectFour {
         return hasWon;
     }
 
-    private int[] checkMappings(String direction, int columns, int rows){
-        int[] orderOfOps = new int[2];
-        if(direction=="Vertical"){
-            orderOfOps[0] = columns;
-            orderOfOps[1] = rows;
-        } else if (direction == "Horizontal"){
-            orderOfOps[0] = rows;
-            orderOfOps[1] = columns;
-        }
-
-        return orderOfOps;
-    }
-
-    private boolean checkForWinners(char player, String direction){
-        boolean hasWon = false;
-        int count = 0;
-        int columns = this.board.getBoardSize();
-        int rows = this.board.getColumnSize();
-        int[] Ops = checkMappings(direction, columns, rows);
-        for(int col=0; col<=Ops[0]; col++){
-            for(int row=0; row<=Ops[1]; row++){
-                char currElem = this.board.getElementInColumn(row,col);
-                if(currElem == player){
-                    count = count + 1;
-                    if(count >= 4){
-                        hasWon = true;
-                    }
-                }
-                else{
-                    count = 0;
-                }
-            }
-        }
-        return hasWon;
-    }
-
+    /* check for diagonal winners, the direction parameter is either -1 or 1, and dictates whether the check
+    * is going left to right, or right to left. It is not guarded against (ie someone attempting to use value 2)
+    * because the function has no public exposure
+    * */
     private boolean checkForDiagonalWinners(char player, int direction){
         boolean hasWon = false;
         int count = 0;
