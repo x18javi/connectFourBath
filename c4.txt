@@ -1,0 +1,226 @@
+import java.util.ArrayList;
+
+// logic specific to the game connect four
+public class ConnectFour extends boardGame{
+
+    public static void main(String[] args) {
+        // instantiate game
+        ConnectFour cFour = new ConnectFour();
+        cFour.board.setElementInColumn(4,1,'r');
+        cFour.board.setElementInColumn(3,2,'r');
+        cFour.board.setElementInColumn(2,3,'r');
+        cFour.board.setElementInColumn(1,4,'r');
+        displayToCmd disp = new displayToCmd(cFour.board);
+        System.out.print(cFour.checkForWinner('r')+"\n");
+        disp.printBoard();
+        cFour.board.placeCounter(0,'r');
+        cFour.board.placeCounter(0,'y');
+        cFour.board.placeCounter(1,'r');
+        cFour.board.placeCounter(1,'r');
+        cFour.board.placeCounter(1,'y');
+        cFour.board.placeCounter(1,'y');
+        cFour.board.placeCounter(1,'r');
+        cFour.board.placeCounter(1,'r');
+        cFour.board.placeCounter(2,'y');
+        cFour.board.placeCounter(2,'y');
+        cFour.board.placeCounter(2,'r');
+        cFour.board.placeCounter(2,'r');
+        cFour.board.placeCounter(3,'r');
+        cFour.board.placeCounter(3,'r');
+        cFour.board.placeCounter(3,'y');
+        cFour.board.placeCounter(3,'r');
+        cFour.board.placeCounter(3,'r');
+        cFour.board.placeCounter(3,'r');
+        cFour.board.placeCounter(4,'r');
+        cFour.board.placeCounter(4,'y');
+        cFour.board.placeCounter(4,'r');
+        cFour.board.placeCounter(5,'r');
+        cFour.board.placeCounter(5,'y');
+        cFour.board.placeCounter(5,'y');
+        cFour.board.placeCounter(5,'y');
+        cFour.board.placeCounter(6,'y');
+        cFour.board.placeCounter(6,'r');
+        cFour.board.placeCounter(6,'y');
+        //displayToCmd disp = new displayToCmd(cFour.board);
+        disp.printBoard();
+        System.out.print(cFour.checkForWinner('r'));
+    }
+
+    // instantiate the class with the known board size of 6x7
+    public ConnectFour(){
+        super(6,7);
+    }
+
+    // helper function to return the number of columns in the board
+    public int getBoardLength(){
+        return this.board.getBoardSize()+1;
+    }
+
+    // validate player input, takes a Player class as the parameter
+    public void getInput(Player p){
+        boolean successChecker = false;
+        while(!successChecker){
+            int input = p.getInput();
+            successChecker=(
+                    this.board.placeCounter(
+                            input,
+                            p.tokenColour)
+            );
+        }
+    }
+
+    // play the game. Loop through the players who are stored in the playerlist, getting the players input and checking for a winner each time
+    public void playGame(){
+        displayToCmd disp = new displayToCmd(this.board);
+        boolean breakGame = false;
+
+        disp.printBoard();
+        while(!breakGame){
+
+            for(Player p : this.playerList){
+
+                this.getInput(p);
+                disp.printBoard();
+                if(checkForWinner(p.tokenColour)){
+                    System.out.print("Player "+p.tokenColour+" wins!!\n");
+                    breakGame = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // consolidate the different checks that are run in connect for, vertical, horizontal, diagonal from left-to-right and right-to-left
+    private boolean checkForWinner(char player){
+        boolean check = false;
+        if(
+            checkForHorizontalWinners(player) ||
+            checkForVerticalWinners(player) ||
+            checkForDiagonalWinners(player, 1) ||
+            checkForDiagonalWinners(player, -1)
+        ){
+            check = true;
+        }
+        return check;
+    }
+
+    // logic to check for a horizontal winner on the board
+    private boolean checkForHorizontalWinners(char player){
+        boolean hasWon = false;
+        int countHor = 0;
+        int columns = this.board.getBoardSize();
+        int rows = this.board.getColumnSize();
+        for(int row=0; row<=rows; row++){
+            for(int col=0; col<=columns; col++){
+                char currElem = this.board.getElementInColumn(row,col);
+                if(currElem == player){
+                    countHor++;
+                    if(countHor >= 4){
+                        hasWon = true;
+                    }
+                }
+                else{
+                    countHor = 0;
+                }
+            }
+        }
+        return hasWon;
+    }
+
+    // logic to check for a vertical winner on the board
+    private boolean checkForVerticalWinners(char player){
+        boolean hasWon = false;
+        int countVer = 0;
+        int columns = this.board.getBoardSize();
+        int rows = this.board.getColumnSize();
+        for(int col=0; col<=columns; col++){
+            for(int row=0; row<=rows; row++){
+                ArrayList<Integer> checkVal = new ArrayList<>();
+                char currElem = this.board.getElementInColumn(row,col);
+                if(currElem == player){
+                    checkVal.add(row);
+                    checkVal.add(col);
+                    countVer++;
+                    if(countVer >= 4){
+                        hasWon = true;
+                    }
+                }
+                else{
+                    countVer = 0;
+                }
+            }
+        }
+        return hasWon;
+    }
+
+    /* check for diagonal winners, the direction parameter is either -1 or 1, and dictates whether the check
+    * is going left to right, or right to left. It is not guarded against (ie someone attempting to use value 2)
+    * because the function has no public exposure
+    * */
+    private boolean checkForDiagonalWinners(char player, int direction){
+        boolean hasWon = false;
+        int countD = 0;
+
+        int columns = this.board.getBoardSize();
+        int rows = this.board.getColumnSize();
+        for(int col=0; col<=columns; col++){
+            for(int row=0; row<=rows; row++){
+        //for(int col=0; col<=columns; col++){
+        //    for(int row=rows; row>=0; row--){
+                //Board board2 = new Board(6,7);
+                //displayToCmd disp = new displayToCmd(board2);
+                int counter = 0;
+                ArrayList<Integer> checkVal = new ArrayList<>();
+
+                //while(counter<4){
+                    // System.out.print(counter);
+                    try {
+
+                        if(
+                                this.board.getElementInColumn(row, (col))==player &&
+                                this.board.getElementInColumn(row+1,col+(1*direction))==player &&
+                                this.board.getElementInColumn(row+2,col+(2*direction))==player &&
+                                this.board.getElementInColumn(row+3,col+(3*direction))==player
+                        ){
+                            hasWon = true;
+                        }
+                        /*
+                        char currElem = this.board.getElementInColumn
+                                (
+                                        row + (counter*direction),
+                                        col + (direction*counter)
+                                );
+                        //board2.setElementInColumn(row+(direction*counter), col +(direction*counter), 'x');
+                        board2.setElementInColumn(row, (col), 'x');
+                        board2.setElementInColumn(row+1, (col)+1*direction, 'x');
+                        board2.setElementInColumn(row+2, (col)+2*direction, 'x');
+                        board2.setElementInColumn(row+3, (col)+3*direction, 'x');
+
+
+                        if(currElem == player) {
+                            countD++;
+                            checkVal.add(row+ (direction*counter));
+                            checkVal.add(col + (direction*counter));
+                            if (countD >= 4) {
+                                hasWon = true;
+                            }
+                        }else{
+                            countD = 0;
+                            //break;
+                        }
+                        */
+
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        countD = 0;
+                        break;
+                    }
+
+                    //counter++;
+                //}
+                //disp.printBoard();
+            }
+        }
+        return hasWon;
+    }
+
+}
